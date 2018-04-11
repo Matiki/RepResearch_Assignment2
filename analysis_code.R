@@ -24,3 +24,18 @@ if(!file.exists("storm_data.csv")){
 
 # Read unzipped data file into current R session
 storm_data <- read_csv("storm_data.csv")
+
+# Select only the event type, fatalities/injuries, and damage
+storm_data <- storm_data %>%
+        select(EVTYPE, FATALITIES, INJURIES, 
+               PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP) %>%
+        group_by(EVTYPE)
+
+# Change EVTYPE to factor variable
+storm_data$EVTYPE <- as.factor(storm_data$EVTYPE)
+
+# Summarize data over mean/median/total fatalities/injuries
+storm_data2 <- storm_data %>%
+        summarize(median_fatalities = median(FATALITIES),
+                  median_injuries = median(INJURIES)) %>%
+        arrange(desc(median_fatalities), desc(median_injuries))
