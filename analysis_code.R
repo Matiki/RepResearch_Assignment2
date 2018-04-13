@@ -27,7 +27,7 @@ storm_data <- read_csv("storm_data.csv")
 
 # Select only the event type, fatalities/injuries, and damage
 storm_data <- storm_data %>%
-        select(EVTYPE, FATALITIES, INJURIES, 
+        select(BGN_DATE, STATE, EVTYPE, FATALITIES, INJURIES, 
                PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP) %>%
         group_by(EVTYPE)
 
@@ -54,6 +54,11 @@ most_fatal_total <- storm_data2 %>%
         arrange(desc(total_fatalities)) %>%
         head(25)
 
+most_fatal_max <- storm_data2 %>%
+        arrange(desc(max_fatalities)) %>%
+        head(25)
+
+### Injuries
 most_injury_median <- storm_data2 %>%
         arrange(desc(median_injuries)) %>%
         head(25)
@@ -61,3 +66,14 @@ most_injury_median <- storm_data2 %>%
 most_injury_total <- storm_data2 %>%
         arrange(desc(total_injuries)) %>%
         head(25)
+
+most_injury_max <- storm_data2 %>%
+        arrange(desc(max_injuries)) %>%
+        head(25)
+
+# Combine data
+fatal_list <- list(most_fatal_max, most_fatal_median, most_fatal_total)
+fatal <- sapply(fatal_list, inner_join, by = "EVTYPE")
+
+temp <- inner_join(most_fatal_total, most_fatal_max, by = "EVTYPE") %>% 
+        inner_join(most_fatal_median, by = "EVTYPE")
