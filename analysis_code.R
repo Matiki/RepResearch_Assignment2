@@ -34,46 +34,32 @@ storm_data <- storm_data %>%
 # Change EVTYPE to factor variable
 storm_data$EVTYPE <- as.factor(storm_data$EVTYPE)
 
-# Summarize data over mean/median/max/total fatalities/injuries
+# Summarize data over max/total fatalities/injuries
 storm_data2 <- storm_data %>%
-        summarize(mean_fatalities = mean(FATALITIES),
-                  median_fatalities = median(FATALITIES),
-                  max_fatalities = max(FATALITIES),
-                  total_fatalities = sum(FATALITIES),
-                  mean_injuries = mean(INJURIES),
-                  median_injuries = median(INJURIES),
-                  max_injuries = max(INJURIES),
+        summarize(total_fatalities = sum(FATALITIES),
                   total_injuries = sum(INJURIES))
 
-# Find most dangerous event type
-most_fatal_median <- storm_data2 %>%
-        arrange(desc(median_fatalities)) %>%
-        head(25)
+# Find most dangerous event type by fatalities and injuries
+top = 25
 
-most_fatal_total <- storm_data2 %>%
+top_fatal <- storm_data2 %>%
         arrange(desc(total_fatalities)) %>%
-        head(25)
+        head(top)
 
-most_fatal_max <- storm_data2 %>%
-        arrange(desc(max_fatalities)) %>%
-        head(25)
-
-### Injuries
-most_injury_median <- storm_data2 %>%
-        arrange(desc(median_injuries)) %>%
-        head(25)
-
-most_injury_total <- storm_data2 %>%
+top_injury <- storm_data2 %>%
         arrange(desc(total_injuries)) %>%
-        head(25)
-
-most_injury_max <- storm_data2 %>%
-        arrange(desc(max_injuries)) %>%
-        head(25)
+        head(top)
 
 # Combine data
-fatal_list <- list(most_fatal_max, most_fatal_median, most_fatal_total)
-fatal <- sapply(fatal_list, inner_join, by = "EVTYPE")
+most_harmful <- inner_join(top_fatal, 
+                           top_injury, 
+                           by = c("EVTYPE", 
+                                  "total_fatalities", 
+                                  "total_injuries"))
 
-temp <- inner_join(most_fatal_total, most_fatal_max, by = "EVTYPE") %>% 
-        inner_join(most_fatal_median, by = "EVTYPE")
+# Filter data by damage in the billions
+storm_data3 <- storm_data %>%
+        filter(CROPDMGEXP == "B" | PROPDMGEXP == "B") %>%
+        summarize(prop_dmg = sum(PROPDMG), 
+                  crop_dmg = sum(CROPDMG)) %>%
+        arrange(desc(prop_dmg), desc(crop_dmg))
