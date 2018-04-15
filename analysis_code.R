@@ -2,6 +2,7 @@
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(tidyr)
 library(R.utils)
 
 # Check if file exists in working directory
@@ -39,7 +40,7 @@ storm_data2 <- storm_data %>%
         summarize(total_fatalities = sum(FATALITIES),
                   total_injuries = sum(INJURIES))
 
-# Find most dangerous event type by fatalities and injuries
+# Find most dangerous event types by fatalities and injuries
 top = 25
 
 top_fatal <- storm_data2 %>%
@@ -57,9 +58,48 @@ most_harmful <- inner_join(top_fatal,
                                   "total_fatalities", 
                                   "total_injuries"))
 
-# Filter data by damage in the billions
+# Filter data by property damage in the billions
 storm_data3 <- storm_data %>%
-        filter(CROPDMGEXP == "B" | PROPDMGEXP == "B") %>%
-        summarize(prop_dmg = sum(PROPDMG), 
-                  crop_dmg = sum(CROPDMG)) %>%
-        arrange(desc(prop_dmg), desc(crop_dmg))
+        filter(PROPDMGEXP == "B") %>%
+        summarize(prop_dmg = sum(PROPDMG)) %>%
+        arrange(desc(prop_dmg))
+
+# Filter by crop damage in the billions
+storm_data4 <- storm_data %>%
+        filter(CROPDMGEXP == "B") %>%
+        summarize(crop_dmg = sum(CROPDMG)) %>%
+        arrange(desc(crop_dmg))
+
+# Plot the most harmful weather events
+most_harmful %>% gather(value = casualties, 
+                        key = type, 
+                        total_fatalities, 
+                        total_injuries) %>% 
+        ggplot(aes(x = reorder(EVTYPE, 
+                               desc(casualties)),
+                   y = log(casualties),
+                   fill = type)) +
+        geom_bar(stat = "identity",
+                 position = "dodge") +
+        theme(axis.text.x = element_text(angle = 45, 
+                                         vjust = 1, 
+                                         hjust=1))
+
+# Plot the most property damaging events
+storm_data3 %>% head() %>%
+        ggplot(aes(x = reorder(EVTYPE,
+                               desc(prop_dmg)),
+                   y = log(prop_dmg))) +
+        geom_bar(stat = "identity") +
+        theme(axis.text.x = element_text(angle = 45, 
+                                         vjust = 1, 
+                                         hjust=1))
+
+# Plot the most crop damaging events
+storm_data4 %>% ggplot(aes(x = reorder(EVTYPE,
+                                       desc(crop_dmg)),
+                           y = crop_dmg)) +
+        geom_bar(stat = "identity") +
+        theme(axis.text.x = element_text(angle = 45, 
+                                         vjust = 1, 
+                                         hjust=1))
