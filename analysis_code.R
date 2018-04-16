@@ -81,9 +81,22 @@ most_harmful %>% gather(value = casualties,
                    fill = type)) +
         geom_bar(stat = "identity",
                  position = "dodge") +
+        labs(title = "Total Fatalities and Injuries by Weather Event",
+             subtitle = paste("The Tornado event has caused",
+                              "the most total injuries and total fatalities"),
+             x = "Weather Event",
+             y = "Log of the Total Number of Casualties") +
         theme(axis.text.x = element_text(angle = 45, 
                                          vjust = 1, 
-                                         hjust=1))
+                                         hjust=1),
+              legend.title = element_blank(),
+              legend.justification = c(1, 1),
+              legend.position = c(1, 1),
+              legend.background = element_rect(color = 1)) +
+        scale_fill_discrete(breaks = c("total_fatalities",
+                                       "total_injuries"),
+                            labels = c("Total Fatalities",
+                                       "Total Injuries"))
 
 # Plot the most property damaging events
 storm_data3 %>% head() %>%
@@ -93,7 +106,11 @@ storm_data3 %>% head() %>%
         geom_bar(stat = "identity") +
         theme(axis.text.x = element_text(angle = 45, 
                                          vjust = 1, 
-                                         hjust=1))
+                                         hjust=1)) +
+        labs(title = "Billions of Dollars in Property Damage by Weather Event",
+             subtitle = "Flooding has caused the most total property damage",
+             x = "Weather Event",
+             y = "Log of Total Amount of Property Damage (Billions of Dollars)")
 
 # Plot the most crop damaging events
 storm_data4 %>% ggplot(aes(x = reorder(EVTYPE,
@@ -102,4 +119,14 @@ storm_data4 %>% ggplot(aes(x = reorder(EVTYPE,
         geom_bar(stat = "identity") +
         theme(axis.text.x = element_text(angle = 45, 
                                          vjust = 1, 
-                                         hjust=1))
+                                         hjust=1)) +
+        labs(title = "Billions of Dollars in Crop Damage by Weather Event",
+             subtitle = paste("Ice storms and river floods have", 
+                              "casued the most total crop damage"),
+             x = "Weather Event",
+             y = "Total Amount of Crop Damage (Billions of Dollars)")
+
+# Print the most harmful events and most costly events
+filter(storm_data2, EVTYPE == "TORNADO")
+head(storm_data3, 5)
+storm_data4
