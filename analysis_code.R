@@ -28,7 +28,7 @@ storm_data <- read_csv("storm_data.csv")
 
 # Select only the event type, fatalities/injuries, and damage
 storm_data <- storm_data %>%
-        select(BGN_DATE, STATE, EVTYPE, FATALITIES, INJURIES, 
+        select(EVTYPE, FATALITIES, INJURIES, 
                PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP) %>%
         group_by(EVTYPE)
 
