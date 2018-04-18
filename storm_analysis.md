@@ -1,6 +1,6 @@
 ---
-title: "Reproducible Research Assignment 2"
-author: "M. Bruzza"
+title: "Analyzing Weather Events from 1950 to 2011"
+author: "Matiki"
 date: "April 16, 2018"
 output: 
   html_document: 
@@ -8,6 +8,17 @@ output:
 ---
 
 ## Introduction/Synopsis
+Extreme weather events can cause harm to public health and economic problems 
+through property damage. In this exploratory analysis we are interested in 
+discovering which events have caused the greatest number of fatalities and 
+injuries in the US between 1950 and 2011, as well as the most amount of damage 
+to property and crops. The data are gathered from the US national Oceanic and 
+Atmospheric Administration's (NOAA) stomr database.
+
+After looking at how much harm each event type has caused in total, we find that 
+tornadoes have caused the most amount of fatalities and injuries. Floods have 
+the most amount of property damage, while ice storms and river floods have 
+caused the most amount of damage to crops (in billions of dollars).
 
 ## Data Processing
 
@@ -68,7 +79,10 @@ storm_data <- storm_data %>%
 Next we want to find the total number of fatalities and injuries for each type 
 of weather event. We will create two data sets with the top 25 most fatal and 
 injurious weather events, and then re-combine them into one data set with an 
-inner join.
+inner join. (Note: since most events cause very few or no casualties, the mean 
+and median are very low, and don't provid emuch help in discovering whihc events 
+have been the most harmful. So for a quick exploratory analysis we choose 
+instead to find the total)
 
 
 ```r
@@ -154,6 +168,12 @@ most_harmful %>% gather(value = casualties,
 
 ![](storm_analysis_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
+In order to more easily compare all weather events, we have performed a log 
+transformation on the dependent variable (the total number of casualties). We 
+have also separated casualties into fatalities (in red) and injuries (in blue) 
+for comparison. It is easy to see that tornadoes have caused more deaths and 
+injuries then any other weather event.
+
 Next we will look at the weather events that have caused the most property 
 damage.
 
@@ -176,6 +196,10 @@ storm_data3 %>% head() %>%
 
 ![](storm_analysis_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
+We have similarly performed a log transformation of the dependent variable for 
+the sake of comparison, and we find that floods have casued the most amount of
+property damage.
+
 Finally we will take a look at the events which have caused the most damage to 
 crops.
 
@@ -197,3 +221,7 @@ storm_data4 %>% ggplot(aes(x = reorder(EVTYPE,
 ```
 
 ![](storm_analysis_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
+Since these events have caused a similar amount of crop damage (in billions of 
+dollars), we don't need to perform a log transformation. We can see that ice 
+storms and river floods have both caused 5 billion dollars in total crop damage.
